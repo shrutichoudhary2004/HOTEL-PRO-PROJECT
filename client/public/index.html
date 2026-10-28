@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HotelPro — Luxury Hospitality Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            hotel: {
+              navy: '#0b132b',
+              midnight: '#1c2541',
+              slate: '#3a506b',
+              gold: '#cda043',
+              'gold-hover': '#b58832',
+              sand: '#f8f5ee',
+              cream: '#fdfbf7',
+            }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fdfbf7; }
+    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Top Demo Bar -->
+  <div class="bg-hotel-navy text-white text-xs py-2 px-4 border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span><strong>HotelPro OS</strong> — Active Session</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400 text-[11px] hidden sm:inline">1-Click Role Switcher:</span>
+        <button onclick="app.loginDemo('admin')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-semibold text-[11px] border border-amber-500/30">Admin</button>
+        <button onclick="app.loginDemo('staff')" class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 font-semibold text-[11px] border border-blue-500/30">Staff / Front Desk</button>
+        <button onclick="app.loginDemo('guest')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 font-semibold text-[11px] border border-emerald-500/30">Guest</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-8 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="app.switchView('home')">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-hotel-navy to-hotel-midnight flex items-center justify-center text-hotel-gold shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <div>
+          <span class="font-serif text-2xl font-bold tracking-tight text-hotel-navy">Hotel<span class="text-hotel-gold">Pro</span></span>
+          <span class="block text-[10px] tracking-widest uppercase text-slate-400 font-semibold -mt-1">Luxury Hospitality OS</span>
+        </div>
+      </div>
+
+      <!-- Navigation tabs -->
+      <nav class="hidden md:flex items-center gap-6 text-xs font-semibold">
+        <button onclick="app.switchView('home')" id="nav-home" class="text-hotel-navy hover:text-hotel-gold transition">Suites & Booking</button>
+        <button onclick="app.switchView('bookings')" id="nav-bookings" class="text-slate-600 hover:text-hotel-gold transition">My Reservations</button>
+        <button onclick="app.switchView('staff')" id="nav-staff" class="text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition">Front Desk</button>
+        <button onclick="app.switchView('admin')" id="nav-admin" class="text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg hover:bg-purple-100 transition">Admin Portal</button>
+      </nav>
+
+      <!-- Active User Profile -->
+      <div id="user-profile-badge" class="flex items-center gap-3">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main id="app-content" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Dynamic views injected here -->
+  </main>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-hotel-navy text-white px-6 py-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase font-bold tracking-widest text-hotel-gold">Instant Reservation</span>
+          <h3 id="modal-room-title" class="font-serif text-xl font-bold">Deluxe Suite</h3>
+        </div>
+        <button onclick="app.closeBookingModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">✕</button>
+      </div>
+
+      <div id="modal-content" class="p-6 space-y-4 text-xs">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Modal -->
+  <div id="invoice-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-slate-100 px-6 py-3 flex items-center justify-between border-b border-slate-200">
+        <span class="text-xs font-bold text-slate-700">Official Hotel Tax Receipt</span>
+        <div class="flex items-center gap-2">
+          <button onclick="window.print()" class="px-3 py-1 bg-hotel-navy text-white rounded-lg text-xs font-semibold">Print / PDF</button>
+          <button onclick="app.closeInvoiceModal()" class="p-1 text-slate-500 hover:text-slate-800">✕</button>
+        </div>
+      </div>
+      <div id="invoice-content" class="p-8 space-y-6">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-hotel-navy text-slate-400 text-xs py-8 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+      <p class="font-serif text-white font-bold text-base">HotelPro — Enterprise Hospitality Ecosystem</p>
+      <p>Secure Bookings • Real-time Occupancy Synchronization • Automated Invoicing • RBAC Access</p>
+      <p class="text-slate-500 text-[11px] pt-2">© 2026 HotelPro Management Solution. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script>
+    const app = {
+      user: {
+        id: 'user_3',
+        name: 'Sophia Laurent',
+        email: 'guest@hotelpro.com',
+        role: 'guest',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=128&q=80'
+      },
+      currentView: 'home',
+      rooms: [],
+      bookings: [],
+      stats: null,
+      selectedRoom: null,
+
+      init: async function() {
+        if (!localStorage.getItem('hotelpro_token')) {
+          await this.loginDemo('guest');
+        } else {
+          this.renderUserBadge();
+        }
+        await this.fetchRooms();
+        await this.fetchBookings();
+        this.render();
+      },
+
+      renderUserBadge: function() {
+        const el = document.getElementById('user-profile-badge');
+        el.innerHTML = `
+          <div class="text-right hidden sm:block">
+            <p class="text-xs font-bold text-hotel-navy leading-none">${this.user.name}</p>
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider mt-1 bg-slate-100 text-slate-700 border border-slate-200">${this.user.role}</span>
+          </div>
+          <img src="${this.user.avatar}" class="w-10 h-10 rounded-full object-cover ring-2 ring-hotel-gold/60 shadow-sm" alt="User" />
+        `;
+      },
+
+      loginDemo: async function(role) {
+        try {
+          const creds = {
+            admin: { email: 'admin@hotelpro.com', password: 'admin123' },
+            staff: { email: 'staff@hotelpro.com', password: 'staff123' },
+            guest: { email: 'guest@hotelpro.com', password: 'guest123' }
+          }[role];
+
+          const res = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(creds)
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.user = data.user;
+            localStorage.setItem('hotelpro_token', data.token);
+            this.renderUserBadge();
+            if (role === 'admin') this.switchView('admin');
+            else if (role === 'staff') this.switchView('staff');
+            else this.switchView('home');
+          }
+        } catch (e) {
+          console.warn('API fallback demo role switcher');
+          if (role === 'admin') {
+            this.user = { id: 'user_1', name: 'Eleanor Vance', email: 'admin@hotelpro.com', role: 'admin', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=128&q=80' };
+            this.switchView('admin');
+          } else if (role === 'staff') {
+            this.user = { id: 'user_2', name: 'Marcus Sterling', email: 'staff@hotelpro.com', role: 'staff', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=128&q=80' };
+            this.switchView('staff');
+          } else {
+            this.user = { id: 'user_3', name: 'Sophia Laurent', email: 'guest@hotelpro.com', role: 'guest', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=128&q=80' };
+            this.switchView('home');
+          }
+          this.renderUserBadge();
+        }
+      },
+
+      switchView: function(view) {
+        this.currentView = view;
+        this.render();
+      },
+
+      fetchRooms: async function() {
+        try {
+          const res = await fetch('/api/v1/rooms');
+          const data = await res.json();
+          this.rooms = data.data || [];
+        } catch (e) {
+          console.error(e);
+        }
+      },
+
+      fetchBookings: async function() {
+        try {
+          const token = localStorage.getItem('hotelpro_token');
+          const res = await fetch('/api/v1/bookings', {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          const data = await res.json();
+          this.bookings = data.data || [];
+        } catch (e) {
+          console.error(e);
+        }
+      },
+
+      render: function() {
+        const container = document.getElementById('app-content');
+        if (this.currentView === 'home') this.renderHome(container);
+        else if (this.currentView === 'bookings') this.renderBookings(container);
+        else if (this.currentView === 'staff') this.renderStaff(container);
+        else if (this.currentView === 'admin') this.renderAdmin(container);
+      },
+
+      renderHome: function(container) {
+        container.innerHTML = `
+          <!-- Hero Banner -->
+          <div class="relative rounded-3xl overflow-hidden mb-12 shadow-2xl h-[400px] flex items-center justify-center text-center p-6">
+            <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1800&q=85" class="absolute inset-0 w-full h-full object-cover brightness-[0.65]" />
+            <div class="relative z-10 max-w-2xl space-y-4">
+              <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-hotel-gold text-xs font-bold uppercase tracking-wider border border-white/20">The Hospitality Gold Standard</span>
+              <h1 class="font-serif text-4xl sm:text-5xl font-bold text-white leading-tight">Curated Luxury & Effortless Stays</h1>
+              <p class="text-xs sm:text-sm text-slate-200 font-light">Experience contactless digital check-in, real-time availability tracking, and tailored five-star suites.</p>
+            </div>
+          </div>
+
+          <!-- Section Title -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-widest text-hotel-gold">Accommodations</span>
+              <h2 class="font-serif text-3xl font-bold text-hotel-navy">Available Luxury Suites & Villas</h2>
+            </div>
+            <span class="text-xs text-slate-500 font-semibold">${this.rooms.length} Suites in Inventory</span>
+          </div>
+
+          <!-- Rooms Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${this.rooms.map(r => `
+              <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div class="relative h-60 overflow-hidden">
+                  <img src="${r.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <div class="absolute top-3 left-3 bg-hotel-navy/90 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">${r.type}</div>
+                  <div class="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full ${
+                    r.status === 'available' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  }">${r.status}</div>
+                </div>
+
+                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <div>
+                    <h3 class="font-serif text-lg font-bold text-hotel-navy">${r.title}</h3>
+                    <p class="text-xs text-slate-500 line-clamp-2 mt-1">${r.description}</p>
+                    <div class="flex items-center gap-4 text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100">
+                      <span>Room #${r.roomNumber}</span>
+                      <span>Floor ${r.floor}</span>
+                      <span>${r.capacity.adults} Adults</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                    <div>
+                      <span class="font-serif text-xl font-bold text-hotel-navy">$${r.pricePerNight}</span>
+                      <span class="text-[11px] text-slate-400">/ night</span>
+                    </div>
+                    <button onclick="app.openBookingModal('${r._id || r.id}')" ${r.status !== 'available' ? 'disabled' : ''} class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition ${
+                      r.status === 'available' ? 'bg-hotel-navy text-white hover:bg-hotel-midnight shadow-sm' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    }">${r.status === 'available' ? 'Reserve' : 'Unavailable'}</button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      },
+
+      openBookingModal: function(roomId) {
+        const room = this.rooms.find(r => r._id === roomId || r.id === roomId);
+        if (!room) return;
+        this.selectedRoom = room;
+
+        document.getElementById('modal-room-title').innerText = room.title;
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 4);
+
+        const dIn = tomorrow.toISOString().split('T')[0];
+        const dOut = nextWeek.toISOString().split('T')[0];
+
+        document.getElementById('modal-content').innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-500 font-bold mb-1">Check-In</label>
+              <input type="date" id="book-in" value="${dIn}" class="w-full p-2 bg-slate-50 border rounded-xl" />
+            </div>
+            <div>
+              <label class="block text-slate-500 font-bold mb-1">Check-Out</label>
+              <input type="date" id="book-out" value="${dOut}" class="w-full p-2 bg-slate-50 border rounded-xl" />
+            </div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-2xl border space-y-1.5">
+            <div class="flex justify-between"><span>Base Rate:</span><span class="font-bold">$${room.pricePerNight} / night</span></div>
+            <div class="flex justify-between"><span>Estimated Nights:</span><span>3 Nights</span></div>
+            <div class="flex justify-between"><span>Hotel Occupancy Tax (12%):</span><span>$${Math.round(room.pricePerNight * 3 * 0.12)}</span></div>
+            <div class="flex justify-between font-bold text-hotel-navy pt-2 border-t text-sm">
+              <span>Total Amount:</span>
+              <span class="text-hotel-gold font-serif text-base">$${Math.round(room.pricePerNight * 3 * 1.17)}</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-500 font-bold mb-1">Payment Method</label>
+            <select id="book-payment" class="w-full p-2 bg-slate-50 border rounded-xl">
+              <option value="credit_card">Credit Card (Instant Online)</option>
+              <option value="stripe">Stripe VIP Payment</option>
+              <option value="cash_on_arrival">Pay at Front Desk</option>
+            </select>
+          </div>
+
+          <button onclick="app.submitBooking()" class="w-full py-3 bg-hotel-navy text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-hotel-midnight shadow-md">
+            Confirm & Pay
+          </button>
+        `;
+
+        document.getElementById('booking-modal').classList.remove('hidden');
+      },
+
+      closeBookingModal: function() {
+        document.getElementById('booking-modal').classList.add('hidden');
+      },
+
+      submitBooking: async function() {
+        if (!this.selectedRoom) return;
+        const checkIn = document.getElementById('book-in').value;
+        const checkOut = document.getElementById('book-out').value;
+        const paymentMethod = document.getElementById('book-payment').value;
+
+        const payload = {
+          roomId: this.selectedRoom._id || this.selectedRoom.id,
+          checkInDate: checkIn,
+          checkOutDate: checkOut,
+          numberOfGuests: { adults: 2, children: 0 },
+          paymentMethod: paymentMethod,
+          extraServices: [{ name: 'VIP Welcome Champagne', price: 95 }]
+        };
+
+        try {
+          const token = localStorage.getItem('hotelpro_token');
+          const res = await fetch('/api/v1/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token ? `Bearer ${token}` : ''
+            },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.closeBookingModal();
+            await this.fetchBookings();
+            await this.fetchRooms();
+            this.openInvoice(data.data);
+          } else {
+            alert(data.message || 'Booking failed');
+          }
+        } catch (e) {
+          alert('Reservation processed in demo store!');
+          this.closeBookingModal();
+        }
+      },
+
+      openInvoiceById: function(bookingId) {
+        const b = this.bookings.find(item => item._id === bookingId || item.id === bookingId);
+        if (b) {
+          this.openInvoice(b);
+        }
+      },
+
+      openInvoice: function(booking) {
+        const room = typeof booking.room === 'object' ? booking.room : this.rooms.find(r => r._id === booking.room) || {};
+        document.getElementById('invoice-content').innerHTML = `
+          <div class="flex justify-between items-start border-b pb-4">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-hotel-navy">HotelPro Luxury Resort</h2>
+              <p class="text-[11px] text-slate-400">742 Evergreen Blvd, Coastal Heights, CA<br/>reservations@hotelpro.com</p>
+            </div>
+            <div class="text-right">
+              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">PAID & CONFIRMED</span>
+              <p class="font-mono text-xs font-bold mt-1">Invoice: ${booking.invoiceNumber || 'INV-2026-8910'}</p>
+              <p class="text-[11px] text-slate-400">Ref: ${booking.bookingCode}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">Guest</span>
+              <p class="font-bold">${booking.guestDetails?.name || this.user.name}</p>
+              <p class="text-slate-500">${booking.guestDetails?.email || this.user.email}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">Stay Details</span>
+              <p class="font-bold">${room.title || 'Executive Suite'} (Room #${room.roomNumber})</p>
+              <p class="text-slate-500">${booking.totalNights} Nights</p>
+            </div>
+          </div>
+
+          <div class="border rounded-xl overflow-hidden">
+            <table class="w-full text-xs">
+              <thead class="bg-slate-50 border-b">
+                <tr><th class="p-2 text-left">Description</th><th class="p-2 text-right">Amount</th></tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr><td class="p-2">Suite Stay (${booking.totalNights} nights x $${booking.roomRate})</td><td class="p-2 text-right">$${booking.totalNights * booking.roomRate}</td></tr>
+                <tr><td class="p-2 text-slate-500">Hotel Occupancy Tax & Service Fee</td><td class="p-2 text-right">$${(booking.taxAmount || 0) + (booking.serviceFee || 0)}</td></tr>
+                <tr class="font-bold bg-slate-50"><td class="p-2">Total Amount Paid</td><td class="p-2 text-right font-serif text-hotel-navy text-sm">$${booking.totalAmount}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        document.getElementById('invoice-modal').classList.remove('hidden');
+      },
+
+      closeInvoiceModal: function() {
+        document.getElementById('invoice-modal').classList.add('hidden');
+      },
+
+      renderBookings: function(container) {
+        container.innerHTML = `
+          <div class="max-w-4xl mx-auto space-y-6">
+            <h2 class="font-serif text-3xl font-bold text-hotel-navy">My Stays & Receipts</h2>
+            <div class="space-y-4">
+              ${this.bookings.map(b => {
+                const room = typeof b.room === 'object' ? b.room : this.rooms.find(r => r._id === b.room) || {};
+                return `
+                  <div class="p-5 bg-white rounded-2xl border shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs font-bold text-hotel-navy">${b.bookingCode}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">${b.bookingStatus}</span>
+                      </div>
+                      <h4 class="font-serif text-base font-bold mt-1">${room.title || 'Deluxe Suite'}</h4>
+                      <p class="text-xs text-slate-400">Room #${room.roomNumber} • Total: $${b.totalAmount}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button onclick="app.openInvoiceById('${b._id || b.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Invoice</button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      },
+
+      renderStaff: function(container) {
+        const arrivals = this.bookings.filter(b => b.bookingStatus === 'confirmed');
+        const inHouse = this.bookings.filter(b => b.bookingStatus === 'checked-in');
+        const cleaningRooms = this.rooms.filter(r => r.status === 'cleaning');
+
+        container.innerHTML = `
+          <div class="space-y-8">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-widest text-hotel-gold">Front Desk Operations</span>
+              <h2 class="font-serif text-3xl font-bold text-hotel-navy">Today's Guest Turnaround</h2>
+            </div>
+
+            ${cleaningRooms.length > 0 ? `
+              <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-bold text-amber-900">Housekeeping: ${cleaningRooms.length} Room(s) Need Cleaning</h4>
+                  <p class="text-[11px] text-amber-700">Click to approve sanitized rooms back to available inventory.</p>
+                </div>
+                <div class="flex gap-2">
+                  ${cleaningRooms.map(r => `
+                    <button onclick="app.updateRoomStatus('${r._id || r.id}', 'available')" class="px-3 py-1 bg-white border border-amber-300 text-amber-900 font-bold rounded-lg text-xs hover:bg-amber-100">Room #${r.roomNumber} Cleaned</button>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white p-6 rounded-3xl border shadow-sm space-y-4">
+                <h3 class="font-serif text-lg font-bold text-hotel-navy">Pending Check-Ins (${arrivals.length})</h3>
+                <div class="space-y-3">
+                  ${arrivals.map(b => `
+                    <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-xs">
+                      <div>
+                        <p class="font-bold">${b.guestDetails?.name}</p>
+                        <p class="text-slate-400">Ref: ${b.bookingCode}</p>
+                      </div>
+                      <button onclick="app.updateBookingStatus('${b._id || b.id}', 'checked-in')" class="px-3 py-1.5 bg-hotel-navy text-white font-bold rounded-lg hover:bg-hotel-midnight">Check In</button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-3xl border shadow-sm space-y-4">
+                <h3 class="font-serif text-lg font-bold text-hotel-navy">In-House Guests (${inHouse.length})</h3>
+                <div class="space-y-3">
+                  ${inHouse.map(b => `
+                    <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-xs">
+                      <div>
+                        <p class="font-bold">${b.guestDetails?.name}</p>
+                        <p class="text-slate-400">Ref: ${b.bookingCode}</p>
+                      </div>
+                      <button onclick="app.updateBookingStatus('${b._id || b.id}', 'checked-out')" class="px-3 py-1.5 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700">Check Out</button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      updateBookingStatus: async function(id, status) {
+        const token = localStorage.getItem('hotelpro_token');
+        await fetch(`/api/v1/bookings/${id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+          body: JSON.stringify({ bookingStatus: status })
+        });
+        await this.fetchBookings();
+        await this.fetchRooms();
+        this.render();
+      },
+
+      updateRoomStatus: async function(id, status) {
+        const token = localStorage.getItem('hotelpro_token');
+        await fetch(`/api/v1/rooms/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+          body: JSON.stringify({ status })
+        });
+        await this.fetchRooms();
+        this.render();
+      },
+
+      renderAdmin: function(container) {
+        const totalRev = this.bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + (b.totalAmount || 0), 0);
+        const occupied = this.rooms.filter(r => r.status === 'occupied').length;
+        const occRate = this.rooms.length > 0 ? Math.round((occupied / this.rooms.length) * 100) : 0;
+
+        container.innerHTML = `
+          <div class="space-y-8">
+            <h2 class="font-serif text-3xl font-bold text-hotel-navy">Executive Operations Center</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="p-5 bg-white rounded-2xl border shadow-sm">
+                <span class="text-slate-400 text-xs font-bold uppercase">Total Revenue</span>
+                <h4 class="font-serif text-2xl font-bold text-hotel-navy mt-1">$${totalRev.toLocaleString()}</h4>
+              </div>
+              <div class="p-5 bg-white rounded-2xl border shadow-sm">
+                <span class="text-slate-400 text-xs font-bold uppercase">Occupancy Rate</span>
+                <h4 class="font-serif text-2xl font-bold text-amber-600 mt-1">${occRate}%</h4>
+              </div>
+              <div class="p-5 bg-white rounded-2xl border shadow-sm">
+                <span class="text-slate-400 text-xs font-bold uppercase">Total Inventory</span>
+                <h4 class="font-serif text-2xl font-bold text-hotel-navy mt-1">${this.rooms.length} Suites</h4>
+              </div>
+              <div class="p-5 bg-white rounded-2xl border shadow-sm">
+                <span class="text-slate-400 text-xs font-bold uppercase">Reservations</span>
+                <h4 class="font-serif text-2xl font-bold text-emerald-600 mt-1">${this.bookings.length} Bookings</h4>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl border p-6 space-y-4">
+              <h3 class="font-serif text-xl font-bold">Room Inventory Synchronization</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead class="bg-slate-50 border-b">
+                    <tr><th class="p-3">Room</th><th class="p-3">Title</th><th class="p-3">Rate</th><th class="p-3">Status</th></tr>
+                  </thead>
+                  <tbody class="divide-y">
+                    ${this.rooms.map(r => `
+                      <tr>
+                        <td class="p-3 font-mono font-bold">#${r.roomNumber}</td>
+                        <td class="p-3 font-semibold">${r.title}</td>
+                        <td class="p-3">$${r.pricePerNight}</td>
+                        <td class="p-3">
+                          <select onchange="app.updateRoomStatus('${r._id || r.id}', this.value)" class="p-1 border rounded text-xs font-bold">
+                            <option value="available" ${r.status === 'available' ? 'selected' : ''}>Available</option>
+                            <option value="occupied" ${r.status === 'occupied' ? 'selected' : ''}>Occupied</option>
+                            <option value="cleaning" ${r.status === 'cleaning' ? 'selected' : ''}>Cleaning</option>
+                            <option value="maintenance" ${r.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                          </select>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    window.onload = () => app.init();
+  </script>
+</body>
+</html>
