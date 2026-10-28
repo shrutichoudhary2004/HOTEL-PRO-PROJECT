@@ -28,9 +28,10 @@ const MyBookingsPage = () => {
     setLoading(true);
     try {
       const res = await bookingsAPI.getMyBookings();
-      setBookings(res.data.data);
+      setBookings(res.data?.data || []);
     } catch (err) {
       console.error('Failed to load bookings:', err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }

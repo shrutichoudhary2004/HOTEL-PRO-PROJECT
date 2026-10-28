@@ -28,7 +28,7 @@ const RoomDetailPage = () => {
     const fetchRoom = async () => {
       try {
         const res = await roomsAPI.getRoomById(id);
-        setRoom(res.data.data);
+        setRoom(res.data?.data || null);
       } catch (err) {
         console.error('Failed to load room:', err);
       } finally {

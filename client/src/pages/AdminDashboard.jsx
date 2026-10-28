@@ -49,9 +49,9 @@ const AdminDashboard = () => {
         roomsAPI.getRooms(),
         bookingsAPI.getAllBookings(),
       ]);
-      setStats(statsRes.data.data);
-      setRooms(roomsRes.data.data);
-      setBookings(bookingsRes.data.data);
+      setStats(statsRes.data?.data || null);
+      setRooms(roomsRes.data?.data || []);
+      setBookings(bookingsRes.data?.data || []);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {

@@ -84,7 +84,7 @@ const BookingModal = () => {
       };
 
       const res = await bookingsAPI.createBooking(payload);
-      setConfirmedBooking(res.data.data);
+      setConfirmedBooking(res.data?.data || res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to complete booking. Please try again.');
     } finally {

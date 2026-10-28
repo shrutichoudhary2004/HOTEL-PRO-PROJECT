@@ -28,8 +28,8 @@ const StaffDashboard = () => {
         bookingsAPI.getAllBookings(),
         roomsAPI.getRooms(),
       ]);
-      setBookings(bRes.data.data);
-      setRooms(rRes.data.data);
+      setBookings(bRes.data?.data || []);
+      setRooms(rRes.data?.data || []);
     } catch (err) {
       console.error('Error fetching staff data:', err);
     } finally {

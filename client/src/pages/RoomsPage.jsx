@@ -25,7 +25,7 @@ const RoomsPage = () => {
       if (onlyAvailable) params.status = 'available';
 
       const res = await roomsAPI.getRooms(params);
-      let list = res.data.data;
+      let list = res.data?.data ? [...res.data.data] : [];
 
       if (sortBy === 'price-low') {
         list.sort((a, b) => a.pricePerNight - b.pricePerNight);
@@ -38,18 +38,19 @@ const RoomsPage = () => {
       setRooms(list);
     } catch (err) {
       console.error('Error loading rooms:', err);
+      setRooms([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredRooms = rooms.filter((r) => {
+  const filteredRooms = (rooms || []).filter((r) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return (
-      r.title.toLowerCase().includes(q) ||
-      r.roomNumber.includes(q) ||
-      r.description.toLowerCase().includes(q)
+      (r.title && r.title.toLowerCase().includes(q)) ||
+      (r.roomNumber && r.roomNumber.toString().includes(q)) ||
+      (r.description && r.description.toLowerCase().includes(q))
     );
   });
 

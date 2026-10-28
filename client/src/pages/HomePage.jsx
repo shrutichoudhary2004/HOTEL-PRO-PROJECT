@@ -24,7 +24,8 @@ const HomePage = () => {
     const fetchRooms = async () => {
       try {
         const res = await roomsAPI.getRooms();
-        setFeaturedRooms(res.data.data.slice(0, 3));
+        const list = res.data?.data || [];
+        setFeaturedRooms(list.slice(0, 3));
       } catch (err) {
         console.error('Failed to load rooms:', err);
       } finally {
